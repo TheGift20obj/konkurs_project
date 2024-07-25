@@ -1,12 +1,9 @@
 <script setup>
-import Blog from './components/Blog.vue'
+import Login from '../src/componets/Login.vue'
 </script>
 
 <template>
-  <main class="container mx-auto">
-    <img src="/logo2.svg" alt="DFINITY logo" />
-    <br />
-    <br />
-    <Blog />
-  </main>
+  <div>
+    <Login />
+  </div>
 </template>
