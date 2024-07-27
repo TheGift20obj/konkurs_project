@@ -30,8 +30,8 @@
                 <span v-if="!this.temp_edit_comments[index]"> {{ komentarz }} </span>
                 <span v-else>
                     <span v-if="(komentarz == this.temp_edit_comments[index].komentarz || this.temp_edit_comments[index].komentarz == 'null') && this.temp_edit_comments[index].option != 'delete'"> {{ komentarz }} </span>
-                    <span class="text-blue-600" v-if="komentarz != this.temp_edit_comments[index].komentarz && this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'add'"> {{ this.temp_edit_comments[index].komentarz }} </span>
-                    <span class="text-red-600" v-if="this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'delete'"> {{ this.temp_edit_comments[index].komentarz }} </span>
+                    <span class="text-blue-600" v-if="komentarz != this.temp_edit_comments[index].komentarz && this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'add'"> {{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes">nie zapisano</q></span>
+                    <span class="text-red-600" v-if="this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'delete'"> {{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes text-red-600 line-through">komentarz do usunięcia</q></span>
                 </span>
               </span>
               
@@ -60,7 +60,10 @@
       </div>
   
       <div v-if="adding" class="flex flex-col items-center mt-4">
-        <input v-model="newReport" class="border-2 border-blue-600 p-4 w-full max-w-md rounded" type="text" placeholder="Zgłoś nową awarię">
+        <p class="text-lg font-semibold flex items-center">Awaria:&nbsp;&nbsp;
+            <input v-model="newReport" class="border-2 border-blue-600 p-4 w-full max-w-md rounded" type="text" placeholder="podaj nazwę awarii">
+        </p>
+        
         <button class="bg-blue-600 text-white rounded px-4 py-2 mt-2 hover:bg-blue-700" @click="add_report">Zgłoś</button>
       </div>
     </div>
@@ -152,6 +155,7 @@
                   await dzien2_backend.dodaj_komentarz(index, comment);
               }
               for (const item of this.temp_edit_comments) {
+                if (item) {
                   if (item.option == 'add') {
                     await this.saveComment(item.index, item.komentarz)
                   }
@@ -159,6 +163,8 @@
                   {
                     await this.deleteComment(item.index)
                   }
+                }
+                  
               }
               await this.fetchReports();
               this.report = this.reports[this.report_index];
@@ -210,9 +216,6 @@
               this.editingComment = -1;
               this.editComment = "";
           }
-      },
-      async mounted(){
-          await this.show_role();
       }
   }
   </script>

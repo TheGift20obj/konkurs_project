@@ -7,7 +7,7 @@ import UserUI from '../componets/UserUI.vue'
 <template>
   <div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12">
     <div class="max-w-5xl w-full bg-white p-8 rounded-lg shadow-md">
-      <h1 class="text-3xl font-bold text-center mb-8">Witaj w aplikacji konkursowej</h1>
+      <h1 class="text-3xl font-bold text-center mb-8">System zgłaszania awarii</h1>
       <div v-if="logging">
         <div v-if="!logged">
           <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mt-8">
