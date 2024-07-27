@@ -100,6 +100,38 @@ fn dodaj_komentarz(id_awarii: usize, komentarz: String) {
 }
 
 #[update]
+fn edytuj_komentarz(id_awarii: usize, id_komentarza: usize, nowy_komentarz: String) {
+    AWARIE.with(|awarie| {
+        let mut awarie_mut = awarie.borrow_mut();
+        if let Some(awaria) = awarie_mut.get_mut(id_awarii) {
+            if id_komentarza < awaria.komentarze.len() {
+                awaria.komentarze[id_komentarza] = nowy_komentarz;
+            } else {
+                ic_cdk::api::trap("Comment index out of bounds");
+            }
+        } else {
+            ic_cdk::api::trap("Awaria index out of bounds");
+        }
+    });
+}
+
+#[update]
+fn usun_komentarz(id_awarii: usize, id_komentarza: usize) {
+    AWARIE.with(|awarie| {
+        let mut awarie_mut = awarie.borrow_mut();
+        if let Some(awaria) = awarie_mut.get_mut(id_awarii) {
+            if id_komentarza < awaria.komentarze.len() {
+                awaria.komentarze.remove(id_komentarza);
+            } else {
+                ic_cdk::api::trap("Comment index out of bounds");
+            }
+        } else {
+            ic_cdk::api::trap("Awaria index out of bounds");
+        }
+    });
+}
+
+#[update]
 fn edytuj_awarie(id_awarii: usize, nowa_awaria: String) {
     AWARIE.with(|awarie| {
         let mut binding = awarie.borrow_mut();

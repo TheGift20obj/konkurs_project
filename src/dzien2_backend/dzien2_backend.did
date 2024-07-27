@@ -21,4 +21,6 @@ service : {
     "edytuj_awarie": (nat64, text) -> ();
     "nadaj_role": (text, text) -> ();
     "zmien_haslo": (text, text) -> ();
+    "edytuj_komentarz": (nat64, nat64, text) -> ();
+    "usun_komentarz": (nat64, nat64) -> ();
 }
