@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-md mx-auto bg-gray-700 p-8 rounded-md shadow-2xl mt-8">
-    <h2 class="text-2xl font-bold mb-6 text-center text-white">Formularz rejestracji</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-white">Zarejestruj się</h2>
     <form @submit.prevent="register" class="space-y-4">
       <div class="mb-4">
         <label class="block text-gray-300 mb-2">Nazwa użytkownika:</label>

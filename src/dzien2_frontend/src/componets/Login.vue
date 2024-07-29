@@ -15,7 +15,7 @@ import UserUI from '../componets/UserUI.vue'
       <div v-if="logging">
         <div v-if="!logged">
           <div class="max-w-md mx-auto bg-gray-700 p-8 rounded-md shadow-2xl mt-8">
-            <h2 class="text-2xl font-bold mb-6 text-center text-white">Formularz logowania</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center text-white">Zaloguj się</h2>
             <form @submit.prevent="login" class="space-y-4">
               <div class="mb-4">
                 <label class="block text-gray-300 mb-2">Nazwa użytkownika:</label>
@@ -48,7 +48,11 @@ import UserUI from '../componets/UserUI.vue'
           </div>
         </div>
         <div v-else>
-          <h2 class="text-xl font-semibold mb-4 text-white">Zalogowano jako {{ user.username }}</h2>
+          <h2 class="text-xl font-semibold mb-4 text-white">Zalogowano jako {{ user.username }} 
+            <div class="relative z-20 flex justify-end">
+              <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="logout">Wyloguj się</button>
+            </div>
+          </h2>
           <UserUI />
         </div>
         <div v-if="!logged" class="mt-4">
@@ -71,7 +75,7 @@ import UserUI from '../componets/UserUI.vue'
 
 <style scoped>
 .custom-shadow {
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.8), -5px -5px 10px rgba(0, 0, 255, 0.2);
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.8), -3px -3px 10px rgba(0, 0, 136, 0.2);
 }
 </style>
 
@@ -108,10 +112,14 @@ export default {
                   this.logged = true;
                   if (userOption) {
                       this.user = userOption[0];
+                      localStorage.setItem('currentUser', JSON.stringify(this.user));
+                      localStorage.setItem('isLogged', true);
                   }
               } else {
                   this.errorlog = 'Nieprawidłowa nazwa użytkownika lub hasło';
                   this.user = new User("null", "null", "null", "null");
+                  localStorage.removeItem('currentUser');
+                  localStorage.setItem('isLogged', false);
               }
           } catch (error) {
               console.error("Wystąpił błąd podczas logowania:", error);
@@ -119,10 +127,23 @@ export default {
           }
         },
         async toggleLogin() {
-          this.logging = !this.logging;
+            this.logging = !this.logging;
         },
         async logout() {
             this.logged = false;
+            this.user = new User("null", "null", "null", "null");
+            localStorage.removeItem('currentUser');
+            localStorage.setItem('isLogged', false);
+        }
+    },
+    created() {
+        const storedUser = localStorage.getItem('currentUser');
+        const isLogged = JSON.parse(localStorage.getItem('isLogged'));
+
+        if (storedUser && isLogged) {
+            this.user = JSON.parse(storedUser);
+            this.logged = true;
+            this.logging = true;
         }
     }
 }

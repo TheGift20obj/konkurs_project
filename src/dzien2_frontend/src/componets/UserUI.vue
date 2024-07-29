@@ -1,8 +1,13 @@
 <template>
   <div class="p-4">
-    <div class="flex space-x-2 mb-4">
-      <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="show_report">Wyświetl awarie</button>
-      <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="add_report_show">Dodaj awarie</button>
+    <div class="relative z-20 flex justify-start rounded-b-lg">
+      <div class="bg-orange-600 p-1 shadow-lgA rounded-b-lg flex space-x-2 items-center hover:bg-orange-700">
+        <button class="bg-transparent text-white px-4 py-2 focus:outline-none" @click="show_report">Wyświetl awarie</button>
+      </div>
+      <div class="h-full w-px bg-gray-800"></div>
+      <div class="bg-orange-600 p-1 shadow-lgA rounded-b-lg flex space-x-2 items-center hover:bg-orange-700">
+        <button class="bg-transparent text-white px-4 py-2 focus:outline-none" @click="add_report_show">Dodaj awarie</button>
+      </div>
     </div>
 
     <div v-if="showing" class="mt-4">
@@ -41,7 +46,7 @@
           </div>
           <div class="flex space-x-2 mt-2" v-if="editingComment === index">
             <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="addToQueue(index, 'add')">Zapisz</button>
-            <button class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="cancelEditComment(index)">Anuluj</button>
+            <button class="bg-gray-700 text-white rounded px-4 py-2 hover:bg-gray-800" @click="cancelEditComment(index)">Anuluj</button>
             <button class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="addToQueue(index, 'delete')">Usuń</button>
           </div>
         </div>
@@ -58,7 +63,7 @@
         <div class="flex space-x-2 mt-4 flex-wrap">
           <button v-if="editingIndex !== report_index" class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="edit_report(report_index)">Edytuj</button>
           <button v-if="editingIndex === report_index" class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="saveEdit(report_index)">Zapisz</button>
-          <button v-if="editingIndex === report_index" class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="declineEdit">Anuluj</button>
+          <button v-if="editingIndex === report_index" class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-800" @click="declineEdit">Anuluj</button>
           <button v-if="editingIndex === report_index" class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="delete_report(report_index)">Usuń</button>
         </div>
       </div>
@@ -85,6 +90,15 @@
     </div>
   </div>
 </template>
+
+<style>
+  .shadow-lgA {
+    box-shadow: 0 -7px 6px -1px rgba(255, 165, 0, 0.1), 0 -2px 4px -1px rgba(255, 165, 0, 0.06);
+  }
+  .shadow-lgA:hover {
+    box-shadow: 0 -7px 6px -1px rgba(255, 99, 71, 0.1), 0 -2px 4px -1px rgba(255, 99, 71, 0.06);
+  }
+</style>
 
   <script>
   import { dzien2_backend } from 'declarations/dzien2_backend/index';
