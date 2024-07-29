@@ -14,7 +14,7 @@ type Awaria = record {
 service : {
     "dodaj_uzytkownika": (text, text, text, text) -> (text);
     "zaloguj": (text, text) -> (bool, opt User) query;
-    "dodaj_awarie": (text, User) -> ();
+    "dodaj_awarie": (text, User) -> (nat64);
     "odczytaj_awarie": () -> (vec Awaria) query;
     "usun_awarie": (nat64) -> ();
     "dodaj_komentarz": (nat64, text) -> ();

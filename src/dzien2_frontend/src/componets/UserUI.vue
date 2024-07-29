@@ -1,73 +1,90 @@
 <template>
-    <div class="p-4">
-      <div class="flex space-x-2 mb-4">
-        <button class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="show_report">Wyświetl awarie</button>
-        <button class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="add_report_show">Dodaj awarie</button>
-      </div>
-  
-      <div v-if="showing" class="mt-4">
-        <div v-if="show_value" class="grid gap-4">
-            <div v-for="(report, index) in reports" :key="index">
-                <div v-if="userHasAccess(report)" class="bg-stone-300 p-4 rounded drop-shadow-xl">
-                    <p>{{ report.nazwa }}
-                    <button class="bg-blue-600 text-white rounded px-4 py-2 ml-2 hover:bg-blue-700" @click="hide_report(index)">Wybierz</button>
-                    </p>
-                </div>
-            </div>
-        </div>
-  
-        <div v-else class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-          <p class="text-lg font-semibold flex items-center">Awaria:&nbsp;&nbsp;
-            <span v-if="editingIndex !== report_index">  {{ report.nazwa }}  </span>
-            <input v-if="editingIndex === report_index" v-model="editedReports[report_index]" class="border border-blue-600 p-2 w-full mt-1 rounded">
-          </p>
-          <p class="mt-2">Właściciel:&nbsp;&nbsp;{{ report.owner.username }}</p>
-          <p>Kontakt (gmail):&nbsp;&nbsp;{{ report.owner.gmail }}</p>
-          
-          <div v-for="(komentarz, index) in report.komentarze" :key="index" class="bg-stone-300 p-4 rounded mt-4 drop-shadow-xl">
-            <p class="flex items-center">Komentarz:&nbsp;&nbsp;
-              <span v-if="editingComment !== index"> 
-                <span v-if="!this.temp_edit_comments[index]"> {{ komentarz }} </span>
-                <span v-else>
-                    <span v-if="(komentarz == this.temp_edit_comments[index].komentarz || this.temp_edit_comments[index].komentarz == 'null') && this.temp_edit_comments[index].option != 'delete'"> {{ komentarz }} </span>
-                    <span class="text-blue-600" v-if="komentarz != this.temp_edit_comments[index].komentarz && this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'add'"> {{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes">nie zapisano</q></span>
-                    <span class="text-red-600" v-if="this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'delete'"> {{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes text-red-600 line-through">komentarz do usunięcia</q></span>
-                </span>
-              </span>
-              
-              <input v-if="editingComment === index" v-model="editComment" class="border border-blue-600 p-2 w-full mt-1 rounded">
+  <div class="p-4">
+    <div class="flex space-x-2 mb-4">
+      <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="show_report">Wyświetl awarie</button>
+      <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="add_report_show">Dodaj awarie</button>
+    </div>
+
+    <div v-if="showing" class="mt-4">
+      <div v-if="show_value" class="grid gap-4">
+        <div v-for="(report, index) in reports" :key="index">
+          <div v-if="userHasAccess(report)" class="bg-gray-700 p-4 rounded-md shadow-lg relative z-10">
+            <p class="text-white">{{ report.nazwa }}
+              <button class="bg-orange-600 text-white rounded px-4 py-2 ml-2 hover:bg-orange-700" @click="hide_report(index)">Wybierz</button>
             </p>
-            <div class="flex space-x-2 mt-2" v-if="editingIndex === report_index && editingComment !== index">
-              <button class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="edit_comment(index)">Edytuj</button>
-            </div>
-            <div class="flex space-x-2 mt-2" v-if="editingComment === index">
-              <button class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="addToQueue(index, 'add')">Zapisz</button>
-              <button class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="cancelEditComment(index)">Anuluj</button>
-              <button class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="addToQueue(index, 'delete')">Usuń</button>
-            </div>
           </div>
-  
-          <div class="flex space-x-2 mt-4 flex-wrap">
-            <button v-if="editingIndex !== report_index" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="edit_report(report_index)">Edytuj</button>
-            <button v-if="editingIndex === report_index" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="addComment">Dodaj komentarz</button>
-            <button v-if="editingIndex === report_index" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" @click="saveEdit(report_index)">Zapisz</button>
-            <button v-if="editingIndex === report_index" class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="declineEdit">Anuluj</button>
-            <button v-if="editingIndex === report_index" class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="delete_report(report_index)">Usuń</button>
-          </div>
-  
-          <input v-if="editingIndex === report_index" v-model="newComment" class="border border-blue-600 p-2 w-full mt-2 rounded" type="text" placeholder="Dodaj nowy komentarz">
         </div>
       </div>
-  
-      <div v-if="adding" class="flex flex-col items-center mt-4">
-        <p class="text-lg font-semibold flex items-center">Awaria:&nbsp;&nbsp;
-            <input v-model="newReport" class="border-2 border-blue-600 p-4 w-full max-w-md rounded" type="text" placeholder="podaj nazwę awarii">
+
+      <div v-else class="bg-gray-700 p-6 rounded-lg shadow-lg relative z-10">
+        <p class="text-lg font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
+          <span v-if="editingIndex !== report_index">{{ report.nazwa }}</span>
+          <input v-if="editingIndex === report_index" v-model="editedReports[report_index]" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
         </p>
-        
-        <button class="bg-blue-600 text-white rounded px-4 py-2 mt-2 hover:bg-blue-700" @click="add_report">Zgłoś</button>
+        <p class="mt-2 text-white">Właściciel:&nbsp;&nbsp;{{ report.owner.username }}</p>
+        <p class="text-white">Kontakt (gmail):&nbsp;&nbsp;{{ report.owner.gmail }}</p>
+
+        <div v-for="(komentarz, index) in report.komentarze" :key="index" class="bg-gray-600 p-4 rounded-md shadow-lg relative z-10 mt-4">
+          <p class="flex items-center text-white">Komentarz:&nbsp;&nbsp;
+            <span v-if="editingComment !== index">
+              <span v-if="!this.temp_edit_comments[index]">{{ komentarz }}</span>
+              <span v-else>
+                <span v-if="(komentarz == this.temp_edit_comments[index].komentarz || this.temp_edit_comments[index].komentarz == 'null') && this.temp_edit_comments[index].option != 'delete'">{{ komentarz }}</span>
+                <span class="text-blue-400" v-if="komentarz != this.temp_edit_comments[index].komentarz && this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'add'">{{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes">nie zapisano</q></span>
+                <span class="text-red-400" v-if="this.temp_edit_comments[index].komentarz != 'null' && this.temp_edit_comments[index].option == 'delete'">{{ this.temp_edit_comments[index].komentarz }} <q class="italic text-sm no-quotes text-red-400 line-through">komentarz do usunięcia</q></span>
+              </span>
+            </span>
+            <input v-if="editingComment === index" v-model="editComment" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+          </p>
+          <div class="flex space-x-2 mt-2" v-if="editingIndex === report_index && editingComment !== index">
+            <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="edit_comment(index)">Edytuj</button>
+          </div>
+          <div class="flex space-x-2 mt-2" v-if="editingComment === index">
+            <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="addToQueue(index, 'add')">Zapisz</button>
+            <button class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="cancelEditComment(index)">Anuluj</button>
+            <button class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="addToQueue(index, 'delete')">Usuń</button>
+          </div>
+        </div>
+        <div v-for="(komentarz, index) in this.temp_comments" :key="index" class="bg-gray-600 p-4 rounded-md shadow-lg relative z-10 mt-4">
+          <p class="flex items-center text-white">Komentarz:&nbsp;&nbsp;
+            <span class="text-red-400">{{ komentarz }} <q class="italic text-sm no-quotes">nie zapisano</q></span>
+          </p>
+        </div>
+
+        <div>
+          <input v-if="editingIndex === report_index" v-model="newComment" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-2" type="text" placeholder="Dodaj nowy komentarz">
+          <button v-if="editingIndex === report_index" class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="addComment">Dodaj komentarz</button>
+        </div>
+        <div class="flex space-x-2 mt-4 flex-wrap">
+          <button v-if="editingIndex !== report_index" class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="edit_report(report_index)">Edytuj</button>
+          <button v-if="editingIndex === report_index" class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="saveEdit(report_index)">Zapisz</button>
+          <button v-if="editingIndex === report_index" class="bg-gray-600 text-white rounded px-4 py-2 hover:bg-gray-700" @click="declineEdit">Anuluj</button>
+          <button v-if="editingIndex === report_index" class="bg-red-600 text-white rounded px-4 py-2 hover:bg-red-700" @click="delete_report(report_index)">Usuń</button>
+        </div>
       </div>
     </div>
-  </template>
+
+    <div v-if="adding" class="mt-4">
+      <div class="bg-gray-700 p-6 rounded-lg shadow-lg relative z-10">
+        <p class="text-lg font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
+          <input v-model="newReport" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1" type="text" placeholder="podaj nazwę awarii">
+        </p>
+
+        <div v-for="(komentarz, index) in this.temp_comments" :key="index" class="bg-gray-600 p-4 rounded-md shadow-lg relative z-10 mt-4">
+          <p class="flex items-center text-white">Komentarz:&nbsp;&nbsp;
+            <span>{{ komentarz }}</span>
+          </p>
+        </div>
+
+        <div>
+          <input v-model="newComment" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-2" type="text" placeholder="Dodaj nowy komentarz">
+          <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="addComment">Dodaj komentarz</button>
+        </div>
+        <button class="bg-orange-600 text-white rounded px-4 py-2 mt-2 hover:bg-orange-700" @click="add_report">Zgłoś</button>
+      </div>
+    </div>
+  </div>
+</template>
 
   <script>
   import { dzien2_backend } from 'declarations/dzien2_backend/index';
@@ -109,6 +126,7 @@
       },
       methods: {
           async show_report() {
+              this.temp_edit_comments = [];
               this.report_index = -1;
               this.showing = true;
               this.adding = false;
@@ -116,18 +134,21 @@
               this.show_value = true;
           },
           async hide_report(index) {
+              this.temp_edit_comments = [];
               this.report_index = index;
               this.show_value = false;
               this.report = this.reports[index];
               this.reports = [];
           },
           async add_report_show() {
+              this.temp_edit_comments = [];
               this.showing = false;
               this.adding = true;
               this.temp_comments = [];
               this.editingIndex = -1;
           },
           async delete_report(index) {
+              this.temp_edit_comments = [];
               this.report_index = -1;
               await dzien2_backend.usun_awarie(index);
               this.report = new Awaria("", this.$parent.user);
@@ -166,6 +187,7 @@
                 }
                   
               }
+              this.temp_edit_comments = [];
               await this.fetchReports();
               this.report = this.reports[this.report_index];
               this.reports = [];
@@ -185,8 +207,12 @@
               this.editComment = "";
           },
           async add_report() {
-              await dzien2_backend.dodaj_awarie(this.newReport, this.$parent.user);
+              const index = await dzien2_backend.dodaj_awarie(this.newReport, this.$parent.user);
               this.newReport = "";
+              for (const comment of this.temp_comments) {
+                  await dzien2_backend.dodaj_komentarz(index, comment);
+              }
+              this.temp_comments = [];
           },
           async fetchReports() {
               this.reports = await dzien2_backend.odczytaj_awarie();

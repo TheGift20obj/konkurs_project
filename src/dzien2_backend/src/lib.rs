@@ -57,15 +57,22 @@ fn zaloguj(username: String, password: String) -> (bool, Option<User>) {
 }
 
 #[update]
-fn dodaj_awarie(nazwa: String, owner: User) {
-    AWARIE.with(|awarie| {
-        awarie.borrow_mut().push(Awaria {
-            nazwa,
-            komentarze: vec![],
-            owner: owner
-        })
-    })
-} 
+fn dodaj_awarie(nazwa: String, owner: User) -> usize {
+    let awaria = Awaria {
+        nazwa,
+        komentarze: vec![],
+        owner,
+    };
+
+    let id = AWARIE.with(|awarie| {
+        let mut awarie = awarie.borrow_mut();
+        let id = awarie.len();
+        awarie.push(awaria);
+        id
+    });
+
+    id
+}
 
 #[query]
 fn odczytaj_awarie() -> Vec<Awaria> {
