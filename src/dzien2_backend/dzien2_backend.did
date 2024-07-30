@@ -21,7 +21,7 @@ service : {
     "odczytaj_awarie": () -> (vec Awaria) query;
     "usun_awarie": (nat64) -> ();
     "dodaj_komentarz": (nat64, text) -> ();
-    "edytuj_awarie": (nat64, text) -> ();
+    "edytuj_awarie" : (nat64, vec text) -> ();
     "nadaj_role": (text, text) -> ();
     "zmien_haslo": (text, text) -> ();
     "edytuj_komentarz": (nat64, nat64, text) -> ();

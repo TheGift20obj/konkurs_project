@@ -172,11 +172,14 @@ fn usun_komentarz(id_awarii: usize, id_komentarza: usize) {
 }
 
 #[update]
-fn edytuj_awarie(id_awarii: usize, nowa_awaria: String) {
+fn edytuj_awarie(id_awarii: usize, nowa_awaria: Vec<String>) {
     AWARIE.with(|awarie| {
         let mut binding = awarie.borrow_mut();
         if let Some(existing) = binding.get_mut(id_awarii) {
-            existing.nazwa = nowa_awaria;
+            existing.nazwa = nowa_awaria[0].clone();
+            existing.przyczyna = nowa_awaria[1].clone();
+            existing.opis = nowa_awaria[2].clone();
+            existing.miejsce = nowa_awaria[3].clone();
         } else {
             ic_cdk::api::trap("Index out of bounds");
         }
