@@ -22,10 +22,26 @@
       </div>
 
       <div v-else class="bg-gray-700 p-6 rounded-lg shadow-lg relative z-10">
-        <p class="text-lg font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
+        <p class="text-2xl font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
           <span v-if="editingIndex !== report_index">{{ report.nazwa }}</span>
-          <input v-if="editingIndex === report_index" v-model="editedReports[report_index]" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+          <input v-if="editingIndex === report_index" v-model="editedReports[report_index].nazwa" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
         </p>
+
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Przyczyna:&nbsp;&nbsp;
+          <span v-if="editingIndex !== report_index">{{ report.przyczyna }}</span>
+          <input v-if="editingIndex === report_index" v-model="editedReports[report_index].przyczyna" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+        </p>
+
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Opis:&nbsp;&nbsp;
+          <span v-if="editingIndex !== report_index">{{ report.opis }}</span>
+          <input v-if="editingIndex === report_index" v-model="editedReports[report_index].opis" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+        </p>
+
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Miejsce:&nbsp;&nbsp;
+          <span v-if="editingIndex !== report_index">{{ report.miejsce }}</span>
+          <input v-if="editingIndex === report_index" v-model="editedReports[report_index].miejsce" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+        </p>
+
         <p class="mt-2 text-white">Właściciel:&nbsp;&nbsp;{{ report.owner.username }}</p>
         <p class="text-white">Kontakt (gmail):&nbsp;&nbsp;{{ report.owner.gmail }}</p>
 
@@ -71,11 +87,30 @@
 
     <div v-if="adding" class="mt-4">
       <div class="bg-gray-700 p-6 rounded-lg shadow-lg relative z-10">
-        <p class="text-lg font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
-          <input v-model="newReport" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1" type="text" placeholder="podaj nazwę awarii">
+        <p class="text-2xl font-semibold flex items-center text-white">Awaria:&nbsp;&nbsp;
+          <input v-model="newReport.nazwa" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1" type="text" placeholder="podaj nazwę awarii">
         </p>
 
-        <div v-for="(komentarz, index) in this.temp_comments" :key="index" class="bg-gray-600 p-4 rounded-md shadow-lg relative z-10 mt-4">
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Przyczyna awarii:&nbsp;&nbsp;
+          <select v-model="newReport.przyczyna" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1">
+            <option v-for="cause in causes" :value="cause">{{ cause }}</option>
+            <option value="inna">inna</option>
+          </select>
+        </p>
+
+        <div v-if="newReport.przyczyna === 'inna'" class="mt-2">
+          <input v-model="newReport.inna_przyczyna" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-2" type="text" placeholder="Podaj przyczynę awarii">
+        </div>
+
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Opis:&nbsp;&nbsp;
+          <input v-model="newReport.opis" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1" type="text" placeholder="Podaj opis awarii">
+        </p>
+
+        <p class="text-lg font-semibold flex items-center text-white mt-4">Miejsce:&nbsp;&nbsp;
+          <input v-model="newReport.miejsce" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-1" type="text" placeholder="Podaj miejsce awarii">
+        </p>
+
+        <div v-for="(komentarz, index) in temp_comments" :key="index" class="bg-gray-600 p-4 rounded-md shadow-lg relative z-10 mt-4">
           <p class="flex items-center text-white">Komentarz:&nbsp;&nbsp;
             <span>{{ komentarz }}</span>
           </p>
@@ -83,7 +118,7 @@
 
         <div>
           <input v-model="newComment" class="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-700 text-white focus:outline-none focus:border-orange-500 mt-2" type="text" placeholder="Dodaj nowy komentarz">
-          <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700" @click="addComment">Dodaj komentarz</button>
+          <button class="bg-orange-600 text-white rounded px-4 py-2 hover:bg-orange-700 mt-2" @click="addComment">Dodaj komentarz</button>
         </div>
         <button class="bg-orange-600 text-white rounded px-4 py-2 mt-2 hover:bg-orange-700" @click="add_report">Zgłoś</button>
       </div>
@@ -104,10 +139,13 @@
   import { dzien2_backend } from 'declarations/dzien2_backend/index';
   
   class Awaria {
-      constructor(nazwa, komentarze = [], owner) {
+      constructor(nazwa, komentarze = [], owner, przyczyna, opis, miejsce) {
           this.nazwa = nazwa;
           this.komentarze = komentarze;
           this.owner = owner;
+          this.przyczyna = przyczyna;
+          this.opis = opis;
+          this.miejsce = miejsce;
       }
   }
 
@@ -122,7 +160,13 @@
   export default {
       data() {
           return {
-              newReport: "",
+              newReport: {
+                nazwa: "",
+                przyczyna: "",
+                inna_przyczyna: "",
+                opis: "",
+                miejsce: ""
+              },
               show_value: false,
               adding: false,
               showing: false,
@@ -135,7 +179,15 @@
               temp_edit_comments: [],
               newComment: "",
               editComment: "",
-              report_index: -1
+              report_index: -1,
+              causes: [
+                "błąd projektowy",
+                "wada produkcyjna",
+                "wada materiału",
+                "niewłaściwa eksploatacja",
+                "zużycie, zestarzenie",
+                "wyjątkowe warunki otoczenia"
+              ]
           };
       },
       methods: {
@@ -172,7 +224,13 @@
               this.editingIndex = -1;
           },
           async edit_report(index) {
-              this.editedReports[this.report_index] = this.report.nazwa;
+              const rep = {
+                nazwa: this.report.nazwa,
+                przyczyna: this.report.przyczyna,
+                opis: this.report.opis,
+                miejsce: this.report.miejsce
+              };
+              this.editedReports[this.report_index] = rep
               this.temp_comments = [];
               this.editingIndex = index;
           },
@@ -221,8 +279,15 @@
               this.editComment = "";
           },
           async add_report() {
-              const index = await dzien2_backend.dodaj_awarie(this.newReport, this.$parent.user);
-              this.newReport = "";
+              const przyczyna = this.newReport.przyczyna === 'inna' ? this.newReport.inna_przyczyna : this.newReport.przyczyna;
+              const index = await dzien2_backend.dodaj_awarie(this.newReport.nazwa, this.$parent.user, przyczyna, this.newReport.opis, this.newReport.miejsce);
+              this.newReport = {
+                nazwa: "",
+                przyczyna: "",
+                inna_przyczyna: "",
+                opis: "",
+                miejsce: ""
+              };
               for (const comment of this.temp_comments) {
                   await dzien2_backend.dodaj_komentarz(index, comment);
               }

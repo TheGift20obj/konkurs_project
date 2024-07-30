@@ -16,13 +16,17 @@ struct Awaria {
     nazwa: String,
     komentarze: Vec<String>,
     owner: User,
-
+    przyczyna: String,
+    opis: String,
+    miejsce: String
 }
 
 thread_local! {
     static UZYTKOWNICY: RefCell<Vec<User>> = RefCell::new(Vec::new());
     static AWARIE: RefCell<Vec<Awaria>> = RefCell::new(Vec::new());
 }
+
+const SPECJALNY_KOD_ADMINA: &str = "RF_09";
 
 #[init]
 fn init() {
@@ -32,17 +36,43 @@ fn init() {
 }
 
 #[update]
-fn dodaj_uzytkownika(username: String, password: String, role: String, gmail:String) -> String {
+fn dodaj_uzytkownika(username: String, password: String, mut role: String, gmail: String) -> String {
     UZYTKOWNICY.with(|user_storage| {
         let mut users = user_storage.borrow_mut();
         if users.iter().any(|user| user.username == username) {
             return "Użytkownik o tej nazwie już istnieje.".to_string();
         }
-        users.push(User { username, password, role, gmail });
-        "Użytkownik dodany pomyślnie.".to_string()
+
+        // Rozdziel hasło na części
+        let parts: Vec<&str> = password.split(":code:").collect();
+        if parts.len() == 2 {
+            let (password_part, special_code) = (parts[0], parts[1]);
+
+            // Sprawdź, czy specjalny kod jest poprawny
+            if special_code == SPECJALNY_KOD_ADMINA {
+                role = "admin".to_string();
+            }
+
+            // Utwórz nowego użytkownika z odpowiednią rolą
+            users.push(User {
+                username,
+                password: password_part.to_string(),
+                role,
+                gmail,
+            });
+
+            "Użytkownik z rolą admin dodany pomyślnie.".to_string()
+        } else {
+            users.push(User {
+                username,
+                password: password,
+                role,
+                gmail,
+            });
+            "Użytkownik dodany pomyślnie.".to_string()
+        }
     })
 }
-
 #[query]
 fn zaloguj(username: String, password: String) -> (bool, Option<User>) {
     UZYTKOWNICY.with(|user_storage| {
@@ -57,11 +87,14 @@ fn zaloguj(username: String, password: String) -> (bool, Option<User>) {
 }
 
 #[update]
-fn dodaj_awarie(nazwa: String, owner: User) -> usize {
+fn dodaj_awarie(qnazwa: String, qowner: User, qprzyczyna: String, qopis: String, qmiejsce: String) -> usize {
     let awaria = Awaria {
-        nazwa,
+        nazwa: qnazwa,
         komentarze: vec![],
-        owner,
+        owner: qowner,
+        przyczyna: qprzyczyna,
+        opis: qopis,
+        miejsce: qmiejsce
     };
 
     let id = AWARIE.with(|awarie| {

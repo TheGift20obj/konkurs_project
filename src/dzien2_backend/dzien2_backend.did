@@ -9,12 +9,15 @@ type Awaria = record {
     nazwa: text;
     komentarze: vec text;
     owner: User;
+    przyczyna: text;
+    opis: text;
+    miejsce: text;
 };
 
 service : {
     "dodaj_uzytkownika": (text, text, text, text) -> (text);
     "zaloguj": (text, text) -> (bool, opt User) query;
-    "dodaj_awarie": (text, User) -> (nat64);
+    "dodaj_awarie": (text, User, text, text, text) -> (nat64);
     "odczytaj_awarie": () -> (vec Awaria) query;
     "usun_awarie": (nat64) -> ();
     "dodaj_komentarz": (nat64, text) -> ();
